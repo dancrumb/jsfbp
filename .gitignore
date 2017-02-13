@@ -5,3 +5,6 @@ npm-debug.log
 test/components/goodbye-world.txt
 examples/data/text_new.txt
 .idea/
+coverage/
+perf.csv
+test/mocha.opts

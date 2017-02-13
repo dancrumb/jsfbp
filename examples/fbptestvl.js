@@ -1,17 +1,33 @@
 var fbp = require('..');
 
+const IP_COUNT = process.argv[2] || '100000';
+const COPIER_COUNT = process.argv[3] || 1;
 // --- define network ---
 var network = new fbp.Network();
 
 var gendata = network.defProc('./examples/components/gendata.js', 'Gen');
-var copier = network.defProc('./components/copier.js', 'Copy');
-var disc = network.defProc('./components/discard.js', 'Disc');
-// var recvr = fbp.defProc(require('../components/recvr.js'), 'recvr'); // equivalent
+network.initialize(gendata, 'COUNT', IP_COUNT);
 
-network.initialize(gendata, 'COUNT', '100000000');
-network.connect(gendata, 'OUT', copier, 'IN', 5);
-network.connect(copier, 'OUT', disc, 'IN', 5);
+var previous = gendata;
+var next;
+for (var i = 0; i < COPIER_COUNT; i += 1) {
+  next = network.defProc('./components/copier.js', 'Copy'+i);
+  network.connect(previous, 'OUT', next, 'IN', 5);
+  previous = next;
+}
+
+
+var disc = network.defProc('./components/discard.js', 'Disc');
+network.connect(previous, 'OUT', disc, 'IN', 5);
+
+
 
 // --- run ---
 var fiberRuntime = new fbp.FiberRuntime();
-network.run(fiberRuntime, {trace: false});
+var start = +(new Date());
+network.run(fiberRuntime, {trace: false, silent: true}, function () {
+  var elapsed = +(new Date()) - start;
+
+  console.log(IP_COUNT+ ',' + elapsed/IP_COUNT + ',' + COPIER_COUNT+1);
+
+});
