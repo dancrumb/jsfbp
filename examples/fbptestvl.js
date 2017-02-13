@@ -1,7 +1,7 @@
 var fbp = require('..');
 
 const IP_COUNT = process.argv[2] || '100000';
-const COPIER_COUNT = process.argv[3] || 1;
+const COPIER_COUNT = Number.parseInt(process.argv[3] || 1, 10);
 // --- define network ---
 var network = new fbp.Network();
 
@@ -28,6 +28,6 @@ var start = +(new Date());
 network.run(fiberRuntime, {trace: false, silent: true}, function () {
   var elapsed = +(new Date()) - start;
 
-  console.log(IP_COUNT+ ',' + elapsed/IP_COUNT + ',' + COPIER_COUNT+1);
+  console.log(IP_COUNT+ ',' + elapsed/IP_COUNT + ',' + (COPIER_COUNT+1));
 
 });
